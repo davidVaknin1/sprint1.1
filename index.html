@@ -10,6 +10,34 @@
 </head>
 
 <body onload="onInit()">
+    <h1>MineSweeper</h1>
+    <h2>
+        <div class="LIVES"></div>
+        <div class="bombalert hide"></div>
+
+    </h2>
+    <h3>
+        <button class="emoji"></button>
+    </h3>
+
+
+    <button onclick="onChangeDifficulty(5, 2)">
+        Easy (2 bombs)
+    </button>
+    <button onclick="onChangeDifficulty(8, 5)">
+        Normal (5 bombs)
+    </button>
+    <button onclick="onChangeDifficulty(10, 7)">
+        Hard! (7 bombs)
+    </button>
+    <button onclick="onChangeDifficulty(20, 10)">
+        Extreme! (10 bombs)
+    </button>
+
+
+
+
+
 
     <table>
         <tbody class="board" class="cell"></tbody>
