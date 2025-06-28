@@ -6,7 +6,7 @@ var gCopyBoard = gBoard
 var gBombCounter
 var gGame
 var gCurrCell
-const picked = '<img src="img/light-gray.jpg">'
+const picked = '<img src="img/newGray.jpg">'
 const block = '<img src="img/gray.jpg">'
 const bomb = '<img src="img/bomb.jpg">'
 var bombLocation = []
@@ -21,7 +21,7 @@ const winEmoji = '<img src="img/win.png">'
 
 
 function onInit() {
-    
+
     gGame = {
         isOn: true,
         revealedCount: false,
@@ -34,8 +34,17 @@ function onInit() {
     gCurrCellNegs(gBoard)
     renderBoard(gBoard)
     renderLIVES(gLIVES)
+    renderWinAlert()
+    renderLostAlert()
     renderBombAlert()
     renderSmiley(happyEmoji)
+    hideElement('.win')
+    hideElement('.lost')
+
+
+
+
+
 
 
 
@@ -91,6 +100,9 @@ function renderBoard(board) {
         strHTML += '<tr>'
 
         for (var j = 0; j < board[0].length; j++) {
+            if (checkBomb(i, j) === true && board[i][j].isMine === true){
+                addBomb()
+            }
             if (checkBomb(i, j) === true) {
                 board[i][j].isMine = true
             }
@@ -98,19 +110,19 @@ function renderBoard(board) {
             var cell = board[i][j].gameElement
             var id = board[i][j].id
 
-            //const className = `cell (cell-${i}-${j})`
-            if (board[i][j].minesAroundCount !== 0 && board[i][j].gameElement === picked) {
-                strHTML += `
-            <td class="cell" onClick=onCellClicked(${id}) oncontextmenu=addFlag(${id})>
-            ${board[i][j].minesAroundCount}
-            </td>
-            `
-                continue
-            } if (board[i][j].isMarked === true) {
+            if (board[i][j].isMarked === true) {
 
                 strHTML += `
             <td class="cell" onClick=onCellClicked(${id}) oncontextmenu=addFlag(${id})>
             ${flag} 
+            </td>
+            `
+                continue
+            }
+            if (board[i][j].minesAroundCount !== 0 && board[i][j].gameElement === picked) {
+                strHTML += `
+            <td class="cell" onClick=onCellClicked(${id}) oncontextmenu=addFlag(${id})>
+            ${board[i][j].minesAroundCount}
             </td>
             `
                 continue
@@ -162,7 +174,7 @@ function gCurrCellNegs(gBoard) {
 
             var numOfNeighbors = setMinesNegsCount(i, j, gBoard)
             gBoard[i][j].minesAroundCount = numOfNeighbors
-            //console.log(gBoard[i][j])
+
         }
     }
 
@@ -178,6 +190,9 @@ function onCellClicked(id) {
         for (var j = 0; j < gBoard[0].length; j++) {
             var test = gBoard[i][j]
             if (test.id === id) {
+                if (gBoard[i][j].isMarked === true) {
+                    return
+                }
                 gCurrTest = " "
                 gCurrTest = gBoard[i][j]
                 console.log(gCurrTest)
@@ -191,24 +206,25 @@ function onCellClicked(id) {
                     gLIVES--
                     gBoard[i][j].gameElement = bomb
                     gBoard[i][j].isRevealed = true
-                    showElement('.bombalert')
                     renderSmiley(blowEmoji)
                     renderBoard(gBoard)
+                    gGame.isOn = false
+                    if (gLIVES === 0) {
+                        return
+                    }
+                    showElement('.bombalert')
                     setTimeout(bombAlert, 3000)
-                    //gBoard[i][j].gameElement = block
-                    //hideElement('.bombalert')
                     console.log(gLIVES)
-                    //renderBoard(gBoard)
 
                 } else {
                     gBoard[i][j].gameElement = picked
                     gBoard[i][j].isRevealed = true
                 }
-                addBomb()
                 gCurrCellNegs(gBoard)
                 renderBoard(gBoard)
-                checkGameOver()
                 renderLIVES(gLIVES)
+                checkGameOver()
+
 
             }
 
@@ -223,6 +239,7 @@ function addBomb() {
     if (bombLocation.length >= gBombCounter) {
         return
     }
+    bombLocation = []
 
     for (var i = 0; i < gBombCounter; i++) {
         var row = getRandomInt(0, gLevel)
@@ -234,6 +251,9 @@ function addBomb() {
             i: row,
             j: coll
         })
+        if (i === bombLocation[0][i] && j === bombLocation[0][j]) {
+            continue
+        }
 
         gBombCount++
     }
@@ -266,8 +286,9 @@ function renderLIVES(LIVES) {
 }
 
 function checkGameOver() {
-    if (gLIVES === 0) {
+    if (gLIVES === 0 || gLIVES < 0) {
         console.log('you lost')
+        showElement('.lost')
         renderSmiley(blowEmoji)
         gGame.isOn = false
     }
@@ -277,8 +298,9 @@ function checkGameOver() {
                 return
             }
     }
-    
+
     renderSmiley(winEmoji)
+    showElement('.win')
     gGame.isOn = false
 }
 
@@ -290,20 +312,20 @@ window.oncontextmenu = function () {
 function renderBombAlert() {
     var strHTML = ''
     var msg = "you touched a bomb please put a flag on it"
-    strHTML += `<divclass= "bombalert">${msg}</div>`
+    strHTML += `<div class="bombalert">${msg}</div>`
     var elBombAlert = document.querySelector('.bombalert')
     elBombAlert.innerHTML = strHTML
 
 }
 
 function bombAlert() {
+
     renderSmiley(happyEmoji)
     hideElement('.bombalert')
     gBoard[gCurrTest.i][gCurrTest.j].gameElement = block
     renderBoard(gBoard)
-
-
-    console.log('hi')
+    gGame.isOn = true
+    checkGameOver()
 }
 
 
@@ -317,12 +339,9 @@ function showElement(selector) {
     el.classList.remove('hide')
 }
 
-// var elTable = document.querySelector('table')
-// elTable.addEventListener('contextmenu', flag)
 
 function addFlag(id) {
-
-
+    if (gGame.isOn === false) return
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[0].length; j++)
             if (id === gBoard[i][j].id) {
@@ -355,15 +374,30 @@ function renderSmiley(emoji) {
 }
 
 function resetEmoji() {
-    
+
     window.location.reload()
 
 }
 
 
+function renderWinAlert() {
+    var strHTML = ''
+    var msg = "you won! click on the smiley or chose a level to play again!"
+    strHTML += `<divclass="win">${msg}</div>`
+    var elWinAlert = document.querySelector('.win')
+    elWinAlert.innerHTML = strHTML
+
+}
 
 
+function renderLostAlert() {
+    var strHTML = ''
+    var msg = "you lost... click on the smiley or chose a level to try again!"
+    strHTML += `<divclass="win">${msg}</div>`
+    var elLostAlert = document.querySelector('.lost')
+    elLostAlert.innerHTML = strHTML
 
+}
 
 
 

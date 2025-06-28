@@ -9,50 +9,52 @@
     <link rel="stylesheet" href="main.css">
 </head>
 
-<body onload="onInit()">
-    <h1>MineSweeper</h1>
-    <h2>
-        <div class="LIVES"></div>
+<body class="color" onload="onInit()">
+    <div class="blackMode">
+        <h1 class="title">MineSweeper
+        </h1>
+        <h2>
+            <div class="LIVES"></div>
+        </h2>
+
+        <h3 class="h3">
+
+            <button onclick="onChangeDifficulty(2, 2)">
+                Easy (2 bombs)
+            </button>
+            <button onclick="onChangeDifficulty(8, 5)">
+                Normal (5 bombs)
+            </button>
+            <button class="emoji"></button>
+            <button onclick="onChangeDifficulty(10, 7)">
+                Hard! (7 bombs)
+            </button>
+            <button onclick="onChangeDifficulty(20, 10)">
+                Extreme! (10 bombs)
+            </button>
+
+
+        </h3>
+
+
+        <h4>
+
+            <table>
+
+                <tbody class="board" class="cell"></tbody>
+
+            </table>
+        </h4>
         <div class="bombalert hide"></div>
-
-    </h2>
-    <h3>
-        <button class="emoji"></button>
-    </h3>
-
-
-    <button onclick="onChangeDifficulty(5, 2)">
-        Easy (2 bombs)
-    </button>
-    <button onclick="onChangeDifficulty(8, 5)">
-        Normal (5 bombs)
-    </button>
-    <button onclick="onChangeDifficulty(10, 7)">
-        Hard! (7 bombs)
-    </button>
-    <button onclick="onChangeDifficulty(20, 10)">
-        Extreme! (10 bombs)
-    </button>
+        <div class="win hide"></div>
+        <div class="lost hide"></div>
 
 
 
 
-
-
-    <table>
-        <tbody class="board" class="cell"></tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-    <script src="main.js"></script>
-    <script src="utils.js"></script>
+        <script src="main.js"></script>
+        <script src="utils.js"></script>
+    </div>
 </body>
 
 </html>
